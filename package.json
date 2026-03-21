@@ -1,0 +1,5 @@
+{
+  "name": "stockwatch-proxy",
+  "version": "1.0.0",
+  "description": "CORS proxy for StockWatch dashboard"
+}
