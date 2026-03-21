@@ -1,12 +1,22 @@
 export default async function handler(req, res) {
-  // Allow requests from any origin (your GitHub Pages site)
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  const ALLOWED_ORIGINS = [
+    'https://josecitoshit.github.io',
+    'http://localhost',
+    'http://127.0.0.1',
+  ];
+
+  const origin = req.headers.origin || req.headers.referer || '';
+  const allowed = ALLOWED_ORIGINS.some(o => origin.startsWith(o));
+
+  if (!allowed) {
+    return res.status(403).json({ error: 'Forbidden: origin not allowed' });
+  }
+
+  res.setHeader('Access-Control-Allow-Origin', 'https://josecitoshit.github.io');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
+  if (req.method === 'OPTIONS') return res.status(200).end();
 
   const { url } = req.query;
   if (!url) return res.status(400).json({ error: 'Missing url parameter' });
@@ -19,11 +29,7 @@ export default async function handler(req, res) {
       },
       signal: AbortSignal.timeout(15000),
     });
-
-    if (!response.ok) {
-      return res.status(response.status).json({ error: `Upstream error: ${response.status}` });
-    }
-
+    if (!response.ok) return res.status(response.status).json({ error: `Upstream error: ${response.status}` });
     const data = await response.json();
     res.status(200).json(data);
   } catch (e) {
