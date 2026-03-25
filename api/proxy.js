@@ -4,23 +4,17 @@ export default async function handler(req, res) {
     'http://localhost',
     'http://127.0.0.1',
   ];
-
   const origin = req.headers.origin || req.headers.referer || '';
-  const allowed = ALLOWED_ORIGINS.some(o => origin.startsWith(o));
-
+  const allowed = ALLOWED_ORIGINS.some(o => origin.startsWith(o)) || !origin;
   if (!allowed) {
     return res.status(403).json({ error: 'Forbidden: origin not allowed' });
   }
-
   res.setHeader('Access-Control-Allow-Origin', 'https://josecitoshit.github.io');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
   if (req.method === 'OPTIONS') return res.status(200).end();
-
   const { url } = req.query;
   if (!url) return res.status(400).json({ error: 'Missing url parameter' });
-
   try {
     const response = await fetch(decodeURIComponent(url), {
       headers: {
