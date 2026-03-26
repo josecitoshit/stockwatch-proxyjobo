@@ -1,13 +1,18 @@
 export default async function handler(req, res) {
+  const origin = req.headers.origin || req.headers.referer || '';
+  
+  // Log temporal para diagnóstico
+  console.log('ORIGIN:', origin);
+  console.log('ALL HEADERS:', JSON.stringify(req.headers));
+
   const ALLOWED_ORIGINS = [
     'https://josecitoshit.github.io',
     'http://localhost',
     'http://127.0.0.1',
   ];
-  const origin = req.headers.origin || req.headers.referer || '';
   const allowed = ALLOWED_ORIGINS.some(o => origin.startsWith(o)) || !origin;
   if (!allowed) {
-    return res.status(403).json({ error: 'Forbidden: origin not allowed' });
+    return res.status(403).json({ error: 'Forbidden: origin not allowed', receivedOrigin: origin });
   }
   res.setHeader('Access-Control-Allow-Origin', 'https://josecitoshit.github.io');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
