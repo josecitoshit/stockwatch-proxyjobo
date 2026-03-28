@@ -6,23 +6,11 @@ export default async function handler(req, res) {
   const { url } = req.query;
   if (!url) return res.status(400).json({ error: 'Missing url parameter' });
   try {
-    const decoded = decodeURIComponent(url);
-    const isFinviz = decoded.includes('finviz.com');
-    const response = await fetch(decoded, {
+    const response = await fetch(decodeURIComponent(url), {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-        'Accept': isFinviz
-          ? 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
-          : 'application/json',
+        'Accept': 'application/json, text/html, */*',
         'Accept-Language': 'en-US,en;q=0.9',
-        'Cache-Control': 'no-cache',
-        'Pragma': 'no-cache',
-        ...(isFinviz ? {
-          'Sec-Fetch-Dest': 'document',
-          'Sec-Fetch-Mode': 'navigate',
-          'Sec-Fetch-Site': 'none',
-          'Upgrade-Insecure-Requests': '1',
-        } : {}),
       },
       signal: AbortSignal.timeout(15000),
     });
